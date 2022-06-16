@@ -88,7 +88,7 @@ export class VirusTotal {
     fd.append('path', itemPath);
 
     return this.instance
-      .post('/monitor/items', fd.getBuffer(), {
+      .post('https://www.virustotal.com/api/v3/monitor/items', fd.getBuffer(), {
         headers: fd.getHeaders()
       })
       .then(upload => {
