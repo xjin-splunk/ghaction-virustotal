@@ -23,6 +23,7 @@ describe('virustotal', () => {
     'uploads asset on VirusTotal',
     async () => {
       const vt: VirusTotal = new VirusTotal(process.env.VT_API_KEY);
+      await vt.getLargeFileURL(process.env.VT_API_KEY);
       await vt.files('tests/data/foo/bar.txt').then(upload => {
         // eslint-disable-next-line jest/no-standalone-expect
         expect(upload.id).not.toBeUndefined();
