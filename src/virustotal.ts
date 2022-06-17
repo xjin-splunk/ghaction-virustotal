@@ -58,9 +58,9 @@ export class VirusTotal {
     });
     console.log("file size");
     console.log(size);
-    
+
     return this.instance
-      .post(size < 1000 ? "/files" : await this.getURL(this.apiKey), fd.getBuffer(), {
+      .post(size < 32*1024*1024 ? "/files" : await this.getURL(this.apiKey), fd.getBuffer(), {
         headers: fd.getHeaders()
       })
       .then(upload => {
