@@ -20,10 +20,8 @@ export interface Asset {
 
 export class VirusTotal {
   private instance: AxiosInstance;
-  private apiKey = '';
 
   constructor(apiKey: string | undefined) {
-    this.apiKey = apiKey ?? '';
     this.instance = axios.create({
       baseURL: 'https://www.virustotal.com/api/v3',
       headers: {
@@ -31,20 +29,6 @@ export class VirusTotal {
       },
       maxContentLength: Infinity,
       maxBodyLength: Infinity
-    });
-  }
-
-  private async getURL(apiKey: string | undefined): Promise<string> {
-    const instance: AxiosInstance = axios.create({
-      baseURL: '',
-      headers: {
-        Accept: 'application/json',
-        'x-apikey': apiKey ?? ''
-      }
-    });
-
-    return await instance.get('https://www.virustotal.com/api/v3/files/upload_url').then(res => {
-      return res.data.data;
     });
   }
 
@@ -58,9 +42,17 @@ export class VirusTotal {
     });
 
     return this.instance
-      .post(size < 32 * 1024 * 1024 ? '/files' : await this.getURL(this.apiKey), fd.getBuffer(), {
-        headers: fd.getHeaders()
-      })
+      .post(
+        size < 32 * 1024 * 1024
+          ? '/files'
+          : await this.instance.get('/files/upload_url').then(res => {
+              return res.data.data;
+            }),
+        fd.getBuffer(),
+        {
+          headers: fd.getHeaders()
+        }
+      )
       .then(upload => {
         const data = upload.data.data as UploadData;
         data.url = `https://www.virustotal.com/gui/file-analysis/${data.id}/detection`;
