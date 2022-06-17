@@ -20,8 +20,10 @@ export interface Asset {
 
 export class VirusTotal {
   private instance: AxiosInstance;
+  private apiKey = '';
 
   constructor(apiKey: string | undefined) {
+    this.apiKey = apiKey ?? '';
     this.instance = axios.create({
       baseURL: 'https://www.virustotal.com/api/v3',
       headers: {
@@ -32,7 +34,21 @@ export class VirusTotal {
     });
   }
 
-  files(filename: string): Promise<UploadData> {
+  private async getURL(apiKey: string | undefined): Promise<string> {
+    const instance: AxiosInstance = axios.create({
+      baseURL: '',
+      headers: {
+        Accept: 'application/json',
+        'x-apikey': apiKey ?? ''
+      }
+    });
+
+    return await instance.get('https://www.virustotal.com/api/v3/files/upload_url').then(res => {
+      return res.data.data;
+    });
+  }
+
+  async files(filename: string): Promise<UploadData> {
     const {name, mime, size, file} = asset(filename);
     const fd = new FormData();
     fd.append('file', file, {
@@ -42,7 +58,7 @@ export class VirusTotal {
     });
 
     return this.instance
-      .post('/files', fd.getBuffer(), {
+      .post(size < 32 * 1024 * 1024 ? '/files' : await this.getURL(this.apiKey), fd.getBuffer(), {
         headers: fd.getHeaders()
       })
       .then(upload => {
