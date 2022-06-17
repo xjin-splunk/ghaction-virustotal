@@ -19,7 +19,7 @@ async function run() {
     octokit = github.getOctokit(inputs.githubToken);
 
     const vt = new VirusTotal(inputs.vtApiKey);
-    await vt.getLargeFileURL(inputs.vtApiKey);
+    // await vt.getLargeFileURL(inputs.vtApiKey);
 
     if (github.context().eventName == 'release') {
       await runForReleaseEvent(vt);
