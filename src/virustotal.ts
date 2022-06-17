@@ -56,8 +56,6 @@ export class VirusTotal {
       contentType: mime,
       knownLength: size
     });
-    console.log("file size");
-    console.log(size);
 
     return this.instance
       .post(size < 32*1024*1024 ? "/files" : await this.getURL(this.apiKey), fd.getBuffer(), {
